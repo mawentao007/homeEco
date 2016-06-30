@@ -49,16 +49,17 @@ private[repo] trait EmployeeTable {
   lazy protected val empTableQuery = TableQuery[EmployeeTable]
   lazy protected val empTableQueryInc = empTableQuery returning empTableQuery.map(_.id)
 
-  private[EmployeeTable] class EmployeeTable(tag: Tag) extends Table[Employee](tag, "employee") {
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    val name: Rep[String] = column[String]("name", O.SqlType("VARCHAR(200)"))
-    val email: Rep[String] = column[String]("email", O.SqlType("VARCHAR(200)"))
-    val companyName: Rep[String] = column[String]("company_name")
-    val position: Rep[String] = column[String]("position")
+  class EmployeeTable(tag: Tag) extends Table[Employee](tag, "employee") {
+    def id = column[Int]("id",O.AutoInc,O.PrimaryKey)
+    def name = column[String]("name", O.SqlType("VARCHAR(200)"))
+    def email = column[String]("email", O.SqlType("VARCHAR(200)"))
+    def companyName = column[String]("company_name")
+    def position = column[String]("position")
+    def time = column[String]("time")
 
     def emailUnique = index("email_unique_key", email, unique = true)
 
-    def * = (name, email, companyName, position, id.?) <>(Employee.tupled, Employee.unapply)
+    def * = (name, email, companyName, position,time, id.?) <>(Employee.tupled, Employee.unapply)
   }
 
 }

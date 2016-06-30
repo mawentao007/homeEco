@@ -36,6 +36,7 @@ class EmployeeController @Inject()(empRepository: EmployeeRepository, val messag
   /**
     * Handles request for creation of new employee
     */
+
   def create() = Action.async(parse.json) { request =>
     logger.info("Employee Json ===> " + request.body)
     request.body.validate[Employee].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>

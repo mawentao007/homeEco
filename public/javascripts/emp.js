@@ -15,6 +15,7 @@ $(document).ready(function() {
                     { "data": "email" },
                     { "data": "position" },
                     { "data": "companyName" },
+                    { "data": "time" },
                     { data: "id" ,
                      "render": function ( data) {
                                   return '<i id=" ' + data +' " class="edit-button glyphicon glyphicon-edit cursorPointer" ></i>';
