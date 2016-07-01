@@ -1,14 +1,14 @@
 package controllers
 
 import com.google.inject.Inject
-import models.Employee
+import models.Detail
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json._
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._
-import repo.EmployeeRepository
+import repo.AccountRepository
 import utils.Constants
 import utils.JsonFormat._
 
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 /**
   * Handles all requests related to employee
   */
-class EmployeeController @Inject()(empRepository: EmployeeRepository, val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class AccountController @Inject()(empRepository: AccountRepository, val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   import Constants._
 
@@ -39,7 +39,8 @@ class EmployeeController @Inject()(empRepository: EmployeeRepository, val messag
 
   def create() = Action.async(parse.json) { request =>
     logger.info("Employee Json ===> " + request.body)
-    request.body.validate[Employee].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
+    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
+      logger.info(emp.toString)
       empRepository.insert(emp).map { createdEmpId =>
         Ok(successResponse(Json.toJson(Map("id" -> createdEmpId)), Messages("emp.success.created")))
       }
@@ -74,7 +75,7 @@ class EmployeeController @Inject()(empRepository: EmployeeRepository, val messag
     */
   def update = Action.async(parse.json) { request =>
     logger.info("Employee Json ===> " + request.body)
-    request.body.validate[Employee].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
+    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
       empRepository.update(emp).map { res => Ok(successResponse(Json.toJson("{}"), Messages("emp.success.updated"))) }
     })
   }

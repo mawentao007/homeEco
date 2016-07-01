@@ -5,17 +5,17 @@ var ERROR = 'error';
 var serverErrorMessage = 'Oops, something wrong :(';
 
 $(document).ready(function() {
-    $('#empDataTable').DataTable( {
+    $('#accountDataTable').DataTable( {
         "ajax": {
             "url": "/emp/list",
             "dataType": "json"
         },
          "columns": [
-                    { "data": "name" },
-                    { "data": "email" },
-                    { "data": "position" },
-                    { "data": "companyName" },
-                    { "data": "time" },
+                    { "data": "date" },
+                    { "data": "io" },
+                    { "data": "amount" },
+                    { "data": "balance" },
+                    { "data": "reason" },
                     { data: "id" ,
                      "render": function ( data) {
                                   return '<i id=" ' + data +' " class="edit-button glyphicon glyphicon-edit cursorPointer" ></i>';
@@ -30,7 +30,7 @@ $(document).ready(function() {
                 ]
     } );
 
-    var tableEmp = $('#empDataTable').DataTable();
+    var tableAccount = $('#accountDataTable').DataTable();
 
     // Delete employee event
     $("body").on( 'click', '.remove-button', function () {
@@ -45,7 +45,7 @@ $(document).ready(function() {
                      success:function(response){
                                if(response.status == SUCCESS) {
                                   showSuccessAlert(response.msg);
-                                  tableEmp.row(currentRow.parents('tr') ).remove().draw();
+                                  tableAccount.row(currentRow.parents('tr') ).remove().draw();
                               } else {
                                   showErrorAlert(serverErrorMessage);
                               }
@@ -82,7 +82,7 @@ $(document).ready(function() {
 
 
 $('#empModal').on('shown.bs.modal', function () {
-  $('#empForm').trigger("reset");
+  $('#accountForm').trigger("reset");
 });
 
 // Show success alert message
@@ -106,20 +106,20 @@ $.fn.serializeObject = function() {
                         }
                         o[this.name].push(this.value || '');
                     } else {
-                          if(this.name == 'id') {
+                          if(this.name == 'id' ||this.name == 'amount' || this.name == 'balance' || this.name == 'io') {
                              o[this.name] = parseInt(this.value) || 0;
                           } else {
-                         o[this.name] = this.value || '';
-                         }
+                             o[this.name] = this.value || '';
+                          }
                     }
                });
             return JSON.stringify(o);
         };
 
 // Handling form submission for create new employee
-      $('#empForm').on('submit', function(e){
-         var formData = $("#empForm").serializeObject();
-         var empTable = $('#empDataTable').dataTable();
+      $('#accountForm').on('submit', function(e){
+         var formData = $("#accountForm").serializeObject();
+         var empTable = $('#accountDataTable').dataTable();
           e.preventDefault();
            $.ajax({
                 url: "/emp/create",
@@ -161,7 +161,7 @@ $('#empEditForm').on('submit', function(e){
                       success:function(response){
                          if(response.status == SUCCESS) {
                                $('#empEditModal').modal('hide');
-                               $('#empDataTable').DataTable().ajax.reload();
+                               $('#accountDataTable').DataTable().ajax.reload();
                                showSuccessAlert(response.msg)
                          } else {
                             $('#empEditModal').modal('hide');

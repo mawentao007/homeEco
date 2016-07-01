@@ -14,7 +14,7 @@ class EmployeeRepositorySpec extends PlaySpecification{
 
   "Employee repository" should {
 
-    def empRepo(implicit app: Application) = Application.instanceCache[EmployeeRepository].apply(app)
+    def empRepo(implicit app: Application) = Application.instanceCache[AccountRepository].apply(app)
 
     "get all rows" in new WithApplication()  {
       val result = await(empRepo.getAll)
@@ -29,19 +29,19 @@ class EmployeeRepositorySpec extends PlaySpecification{
     }
 
     "insert a row" in new  WithApplication()  {
-      val knolId = await(empRepo.insert(Employee("sky", "sky@knoldus.com",  "knoldus","Senior Consultant")))
+      val knolId = await(empRepo.insert(Detail("sky", "sky@knoldus.com",  "knoldus","Senior Consultant")))
       knolId === 5
     }
 
     "insert multiple rows" in new  WithApplication()  {
-      val result = empRepo.insertAll(List(Employee("sky1", "sky1@knoldus.com", "knoldus","Senior Consultant"),
-        Employee("sky2", "sky2@knoldus.com", "knoldus","Senior Consultant")))
+      val result = empRepo.insertAll(List(Detail("sky1", "sky1@knoldus.com", "knoldus","Senior Consultant"),
+        Detail("sky2", "sky2@knoldus.com", "knoldus","Senior Consultant")))
       val knolIds = await(result)
       knolIds === Seq(5, 6)
     }
 
     "update a row" in new  WithApplication()  {
-      val result = await(empRepo.update(Employee("sky", "sky@knoldus.com",  "knoldus","Senior Consultant", Some(1))))
+      val result = await(empRepo.update(Detail("sky", "sky@knoldus.com",  "knoldus","Senior Consultant", Some(1))))
       result === 1
     }
 

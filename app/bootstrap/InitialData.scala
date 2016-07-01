@@ -2,19 +2,19 @@ package bootstrap
 
 import com.google.inject.Inject
 import javax.inject.Singleton
-import repo.EmployeeRepository
-import models.Employee
+import repo.AccountRepository
+import models.Detail
 import java.util.Date
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.Logger
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class InitialData @Inject() (employeeRepo: EmployeeRepository) {
+class InitialData @Inject() (accountRepo: AccountRepository) {
 
   def insert = for {
-    emps <- employeeRepo.getAll() if (emps.length == 0)
-    _ <- employeeRepo.insertAll(Data.employees)
+    details <- accountRepo.getAll() if (details.length == 0)
+    _ <- accountRepo.insertAll(Data.details)
   } yield {}
 
   try {
@@ -28,10 +28,7 @@ class InitialData @Inject() (employeeRepo: EmployeeRepository) {
 }
 
 object Data {
-  val employees = List(
-    Employee("Satendra", "satendra@knoldus.com", "Knoldus","Senior Consultant","2001-10-06"),
-    Employee("Mayank", "mayank@knoldus.com",  "knoldus","Senior Consultant","2001-10-06"),
-    Employee("Sushil", "sushil@knoldus.com",  "knoldus","Consultant","2001-10-06"),
-    Employee("Narayan", "narayan@knoldus.com",  "knoldus","Consultant","2001-10-06"),
-    Employee("Himanshu", "himanshu@knoldus.com",  "knoldus","Senior Consultant","2001-10-06"))
+  val details = List(
+    //Detail("2", 2, 2,2,"2")
+  )
 }
