@@ -57,16 +57,16 @@ private[repo] trait AccountTable {
 
   class accountTable(tag: Tag) extends Table[Detail](tag, "account") {
     def date = column[String]("date")
-    def io = column[Int]("io")
-    def amount = column[Int]("amount")
-    def balance = column[Int]("balance")
+    def io = column[String]("io")
+    def amount = column[Float]("amount")
+    def balance = column[Float]("balance")
     def reason = column[String]("reason")
     def id = column[Int]("id",O.AutoInc,O.PrimaryKey)
 
 
     //def emailUnique = index("email_unique_key", email, unique = true)
 
-    def * = (date, io, amount, balance,reason, id.?) <>(Detail.tupled, Detail.unapply)
+    def * = (date, io, amount, balance,reason, id.?).shaped.<>({t =>Detail.apply(t._1,t._2,999,t._4,t._5)}, Detail.unapply)
   }
 
 }

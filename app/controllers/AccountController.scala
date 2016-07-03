@@ -15,54 +15,54 @@ import utils.JsonFormat._
 import scala.concurrent.Future
 
 /**
-  * Handles all requests related to employee
+  * Handles all requests related to account
   */
-class AccountController @Inject()(empRepository: AccountRepository, val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class AccountController @Inject()(accRepository: AccountRepository, val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   import Constants._
 
   val logger = Logger(this.getClass())
 
   /**
-    * Handles request for getting all employee from the database
+    * Handles request for getting all account from the database
     */
   def list() = Action.async {
-    empRepository.getAll().map { res =>
-      logger.info("Emp list: " + res)
-      Ok(successResponse(Json.toJson(res), Messages("emp.success.empList")))
+    accRepository.getAll().map { res =>
+      logger.info("acc json list: " + Json.toJson(res))
+      Ok(successResponse(Json.toJson(res), Messages("acc.success.accList")))
     }
   }
 
   /**
-    * Handles request for creation of new employee
+    * Handles request for creation of new account
     */
 
   def create() = Action.async(parse.json) { request =>
-    logger.info("Employee Json ===> " + request.body)
-    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
-      logger.info(emp.toString)
-      empRepository.insert(emp).map { createdEmpId =>
-        Ok(successResponse(Json.toJson(Map("id" -> createdEmpId)), Messages("emp.success.created")))
+    logger.info("account Json ===> " + request.body)
+    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { acc =>
+      logger.info(acc.toString)
+      accRepository.insert(acc).map { createdAccId =>
+        Ok(successResponse(Json.toJson(Map("id" -> createdAccId)), Messages("acc.success.created")))
       }
     })
   }
 
   /**
-    * Handles request for deletion of existing employee by employee_id
+    * Handles request for deletion of existing account by account_id
     */
-  def delete(empId: Int) = Action.async { request =>
-    empRepository.delete(empId).map { _ =>
-      Ok(successResponse(Json.toJson("{}"), Messages("emp.success.deleted")))
+  def delete(accId: Int) = Action.async { request =>
+    accRepository.delete(accId).map { _ =>
+      Ok(successResponse(Json.toJson("{}"), Messages("acc.success.deleted")))
     }
   }
 
   /**
-    * Handles request for get employee details for editing
+    * Handles request for get account details for editing
     */
-  def edit(empId: Int): Action[AnyContent] = Action.async { request =>
-    empRepository.getById(empId).map { empOpt =>
-      empOpt.fold(Ok(errorResponse(Json.toJson("{}"), Messages("emp.error.empNotExist"))))(emp => Ok(
-        successResponse(Json.toJson(emp), Messages("emp.success.employee"))))
+  def edit(accId: Int): Action[AnyContent] = Action.async { request =>
+    accRepository.getById(accId).map { accOpt =>
+      accOpt.fold(Ok(errorResponse(Json.toJson("{}"), Messages("acc.error.accNotExist"))))(acc => Ok(
+        successResponse(Json.toJson(acc), Messages("acc.success.account"))))
     }
   }
 
@@ -71,12 +71,12 @@ class AccountController @Inject()(empRepository: AccountRepository, val messages
   }
 
   /**
-    * Handles request for update existing employee
+    * Handles request for update existing account
     */
   def update = Action.async(parse.json) { request =>
-    logger.info("Employee Json ===> " + request.body)
-    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { emp =>
-      empRepository.update(emp).map { res => Ok(successResponse(Json.toJson("{}"), Messages("emp.success.updated"))) }
+    logger.info("account Json ===> " + request.body)
+    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { acc =>
+      accRepository.update(acc).map { res => Ok(successResponse(Json.toJson("{}"), Messages("acc.success.updated"))) }
     })
   }
 

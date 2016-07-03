@@ -106,8 +106,10 @@ $.fn.serializeObject = function() {
                         }
                         o[this.name].push(this.value || '');
                     } else {
-                          if(this.name == 'id' ||this.name == 'amount' || this.name == 'balance' || this.name == 'io') {
-                             o[this.name] = parseInt(this.value) || 0;
+                          if(this.name == 'id'){
+                                o[this.name] = parseInt(this.value);
+                          } else if (this.name == 'amount' || this.name == 'balance') {
+                                o[this.name] = parseFloat(this.value);
                           } else {
                              o[this.name] = this.value || '';
                           }
@@ -178,3 +180,4 @@ $('#empEditForm').on('submit', function(e){
             });
 
 });
+
