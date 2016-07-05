@@ -6,7 +6,7 @@ import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json._
-import play.api.libs.json.{JsError, JsValue, Json}
+import play.api.libs.json._
 import play.api.mvc._
 import repo.AccountRepository
 import utils.Constants
@@ -28,7 +28,7 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     */
   def list() = Action.async {
     accRepository.getAll().map { res =>
-      logger.info("acc json list: " + Json.toJson(res))
+      //logger.info("acc json list: " + Json.toJson(res))
       Ok(successResponse(Json.toJson(res), Messages("acc.success.accList")))
     }
   }
@@ -38,11 +38,13 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     */
 
   def create() = Action.async(parse.json) { request =>
-    logger.info("account Json ===> " + request.body)
     request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { acc =>
       logger.info(acc.toString)
-      accRepository.insert(acc).map { createdAccId =>
-        Ok(successResponse(Json.toJson(Map("id" -> createdAccId)), Messages("acc.success.created")))
+      val balanceAndId = accRepository.insert(acc)
+      balanceAndId._2 map { id =>
+        Ok(successResponse(
+          JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
+            Messages("成功创建条目")))
       }
     })
   }
@@ -74,7 +76,6 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     * Handles request for update existing account
     */
   def update = Action.async(parse.json) { request =>
-    logger.info("account Json ===> " + request.body)
     request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { acc =>
       accRepository.update(acc).map { res => Ok(successResponse(Json.toJson("{}"), Messages("acc.success.updated"))) }
     })

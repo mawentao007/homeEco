@@ -108,7 +108,7 @@ $.fn.serializeObject = function() {
                     } else {
                           if(this.name == 'id'){
                                 o[this.name] = parseInt(this.value);
-                          } else if (this.name == 'amount' || this.name == 'balance') {
+                          } else if (this.name == 'amount') {
                                 o[this.name] = parseFloat(this.value);
                           } else {
                              o[this.name] = this.value || '';
@@ -134,6 +134,7 @@ $.fn.serializeObject = function() {
                          $('#empModal').modal('hide');
                          var newEmp = jQuery.parseJSON(formData);
                          newEmp['id'] = response.data['id'];
+                         newEmp['balance'] = response.data['balance']
                          empTable.fnAddData([newEmp]);
                          showSuccessAlert(response.msg);
                    } else {

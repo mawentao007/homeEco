@@ -2,11 +2,13 @@ package repo
 
 import javax.inject.{Inject, Singleton}
 
+
+import scala.concurrent.duration._
 import models.Detail
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import play.api.Logger
 
 
@@ -18,16 +20,24 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
 
   val logger = Logger(this.getClass())
 
-  def insert(detail: Detail): Future[Int] = db.run {
-    logger.info(detail.toString)
-    accountTableQueryInc += detail
+  def insert(detail: Detail):(Double,Future[Int]) = {
+    val lastId = accountTableQuery.map(_.id).max
+    val lastBalance = db.run{ accountTableQuery.filter(_.id === lastId).map(_.balance).result.head}
+    val newBalance = Await.result(lastBalance,Duration.Inf) + detail.amount
+    val fId = db.run {
+        accountTableQueryInc +=
+          Detail(detail.date, detail.io, detail.amount, Some(newBalance), detail.reason)
+    }
+    (newBalance,fId)
   }
+
 
   def insertAll(details: List[Detail]): Future[Seq[Int]] = db.run {
     accountTableQueryInc ++= details
   }
 
   def update(detail: Detail): Future[Int] = db.run {
+    logger.info("update detail " + detail.toString)
     accountTableQuery.filter(_.id === detail.id).update(detail)
   }
 
@@ -58,15 +68,20 @@ private[repo] trait AccountTable {
   class accountTable(tag: Tag) extends Table[Detail](tag, "account") {
     def date = column[String]("date")
     def io = column[String]("io")
-    def amount = column[Float]("amount")
-    def balance = column[Float]("balance")
+    def amount = column[Double]("amount")  //double可以避免float引起的精度偏移
+    def balance = column[Double]("balance")
     def reason = column[String]("reason")
     def id = column[Int]("id",O.AutoInc,O.PrimaryKey)
 
 
     //def emailUnique = index("email_unique_key", email, unique = true)
 
-    def * = (date, io, amount, balance,reason, id.?).shaped.<>({t =>Detail.apply(t._1,t._2,999,t._4,t._5)}, Detail.unapply)
+    def * = (date, io, amount, balance.?,reason, id.?) <>( Detail.tupled,Detail.unapply)
+    /**
+      * 自定义映射的方法
+      * def * = (date, io, amount, balance,reason, id.?).shaped.<>(
+      * {t =>Detail.apply(t._1,t._2,(Math.round(t._3 * 100) / 100.0).toFloat,t._4,t._5,t._6)},
+      * Detail.unapply)*/
   }
 
 }
