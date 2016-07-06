@@ -54,7 +54,7 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     */
   def delete(accId: Int) = Action.async { request =>
     accRepository.delete(accId).map { _ =>
-      Ok(successResponse(Json.toJson("{}"), Messages("acc.success.deleted")))
+      Ok(successResponse(Json.toJson("{}"), Messages("成功删除条目")))
     }
   }
 
@@ -76,8 +76,13 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     * Handles request for update existing account
     */
   def update = Action.async(parse.json) { request =>
-    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { acc =>
-      accRepository.update(acc).map { res => Ok(successResponse(Json.toJson("{}"), Messages("acc.success.updated"))) }
+    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { detail =>
+      val balanceAndId = accRepository.update(detail)
+      balanceAndId._2 map { id =>
+        Ok(successResponse(
+          JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
+          Messages("修改成功")))
+      }
     })
   }
 

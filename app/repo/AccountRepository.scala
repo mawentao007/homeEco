@@ -21,14 +21,28 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
   val logger = Logger(this.getClass())
 
   def insert(detail: Detail):(Double,Future[Int]) = {
-    val lastId = accountTableQuery.map(_.id).max
-    val lastBalance = db.run{ accountTableQuery.filter(_.id === lastId).map(_.balance).result.head}
-    val newBalance = Await.result(lastBalance,Duration.Inf) + detail.amount
-    val fId = db.run {
+    if(accountTableQuery.size.result  != 0) {
+      val lastId:Rep[Option[Int]] = accountTableQuery.map(_.id).max
+      logger.info(lastId.toString())
+
+      val lastBalance = db.run {
+        accountTableQuery.filter(_.id === lastId).map(_.balance).result.head
+      }
+      val newBalance = Await.result(lastBalance,Duration.Inf) + detail.amount
+      val fId = db.run {
         accountTableQueryInc +=
           Detail(detail.date, detail.io, detail.amount, Some(newBalance), detail.reason)
+      }
+      (newBalance,fId)
+    }else{
+      val fId = db.run {
+        accountTableQueryInc +=
+          Detail(detail.date, detail.io, detail.amount, Some(detail.amount), detail.reason)
+      }
+      (detail.amount,fId)
     }
-    (newBalance,fId)
+
+
   }
 
 
@@ -36,9 +50,17 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
     accountTableQueryInc ++= details
   }
 
-  def update(detail: Detail): Future[Int] = db.run {
-    logger.info("update detail " + detail.toString)
-    accountTableQuery.filter(_.id === detail.id).update(detail)
+  /**
+    * 只能修改列表结尾的条目，历史账单无法修改
+    *
+    * @param detail
+    * @return
+    */
+  def update(detail: Detail): (Double,Future[Int]) = {
+    db.run {
+      accountTableQuery.filter(_.id === detail.id).delete
+    }
+    insert(detail)
   }
 
   def delete(id: Int): Future[Int] = db.run {

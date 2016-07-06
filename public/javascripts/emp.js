@@ -36,7 +36,7 @@ $(document).ready(function() {
     $("body").on( 'click', '.remove-button', function () {
         var currentRow = $(this);
         var employeeId = $(this).attr('id').trim();
-         bootbox.confirm("Are you sure?", function(result) {
+         bootbox.confirm("确定删除该条目?", function(result) {
             if(result) {
                     $.ajax({
                      url: "/emp/delete",
