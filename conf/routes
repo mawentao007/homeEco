@@ -5,16 +5,16 @@
 # Home page
 GET     /                                   controllers.Application.index
 
-# Employee related routes
-GET     /emp/list                           controllers.AccountController.list
 
-POST    /emp/create                        controllers.AccountController.create
+GET     /detail/list                           controllers.AccountController.list
 
-GET     /emp/edit                           controllers.AccountController.edit(empId: Int)
+POST    /detail/create                        controllers.AccountController.create
 
-POST    /emp/update                        controllers.AccountController.update
+GET     /detail/edit                           controllers.AccountController.edit(detId: Int)
 
-GET     /emp/delete                         controllers.AccountController.delete(empId: Int)
+# POST    /detail/update                        controllers.AccountController.update
+
+GET     /detail/delete                         controllers.AccountController.delete(detId: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)

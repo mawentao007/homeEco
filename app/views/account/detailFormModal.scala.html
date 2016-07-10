@@ -1,24 +1,29 @@
+
 @(param: Any)
 
-<!-- Employee Edit Form Modal -->
-<form id="empEditForm">
-    <div class="modal fade" id="empEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+<!-- Button trigger modal -->
+<button style="padding: 5px 29px !important;" type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#detailModal">
+    添加收支条目
+</button>
+
+
+<form id="detailForm" role="form">
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Edit Employee</h4>
+                    <h4 class="modal-title" id="myModalLabel">账目详情</h4>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="id" name="id">
                     <div class="form-group">
                         <label for="date">Date</label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="Date" required>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="日期" default="" required>
                     </div>
 
                     <div class="form-group">
                         <label for="io">IO</label>
-                        <select  class="form-control" id="io" name="io" placeholder="IO" required>
+                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" required>
                             <option value="收入">收入</option>
                             <option value="支出">支出</option>
                         </select>
@@ -26,23 +31,25 @@
 
                     <div class="form-group">
                         <label for="amount">Amount</label>
-                        <input type="number" step="0.01" class="form-control" id="amount"  name="amount" placeholder="Amount" required>
+                        <input type="number" class="form-control" step="0.01" id="amount"  name="amount" placeholder="数额" required>
                     </div>
 
-                   <!-- <div class="form-group">
+                <!--    <div class="form-group">
                         <label for="balance">Balance</label>
-                        <input type="number" step="0.01"  class="form-control" id="balance"  name="balance" placeholder="Balance" required>
+                        <input type="number" class="form-control" step="0.01" id="balance"  name="balance" placeholder="Balance" required>
                     </div>-->
 
                     <div class="form-group">
                         <label for="reason">reason</label>
-                        <input type="text" class="form-control" id="reason"  name="reason" placeholder="Reason" required>
+                        <input type="text" class="form-control" id="reason"  name="reason" placeholder="备注" required>
                     </div>
+
+
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" >Close</button>
-                    <button type="submit" class="btn btn-primary"> Update </button>
+                    <button id="submit" type="submit" class="btn btn-primary"   >Save </button>
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ import play.api.libs.json.{Writes, Json}
 
 object JsonFormat {
 
-  implicit val employeeFormat = Json.format[Detail]
+  implicit val detailFormat = Json.format[Detail]
 /*  implicit def writes(detail: Detail) = Json.obj(
     "date" -> detail.date,
     "io" -> detail.io,

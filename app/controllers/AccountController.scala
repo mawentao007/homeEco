@@ -29,7 +29,7 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
   def list() = Action.async {
     accRepository.getAll().map { res =>
       //logger.info("acc json list: " + Json.toJson(res))
-      Ok(successResponse(Json.toJson(res), Messages("acc.success.accList")))
+      Ok(successResponse(Json.toJson(res), Messages("detail.success.detailList")))
     }
   }
 
@@ -51,10 +51,17 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
 
   /**
     * Handles request for deletion of existing account by account_id
+    *
+    *
     */
+  //TODO   删除失败的情况要进行提示。
   def delete(accId: Int) = Action.async { request =>
-    accRepository.delete(accId).map { _ =>
-      Ok(successResponse(Json.toJson("{}"), Messages("成功删除条目")))
+    accRepository.delete(accId).map { x =>
+      if(x == 1) {
+        Ok(successResponse(Json.toJson("{}"), Messages("detail.success.deleted")))
+      }else{
+        Ok(successResponse(Json.toJson("{}"), Messages("detail.error.deleted")))
+      }
     }
   }
 
@@ -63,8 +70,8 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     */
   def edit(accId: Int): Action[AnyContent] = Action.async { request =>
     accRepository.getById(accId).map { accOpt =>
-      accOpt.fold(Ok(errorResponse(Json.toJson("{}"), Messages("acc.error.accNotExist"))))(acc => Ok(
-        successResponse(Json.toJson(acc), Messages("acc.success.account"))))
+      accOpt.fold(Ok(errorResponse(Json.toJson("{}"), Messages("detail.error.detailNotExist"))))(acc => Ok(
+        successResponse(Json.toJson(acc), Messages("detail.success.detail"))))
     }
   }
 
@@ -75,16 +82,16 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
   /**
     * Handles request for update existing account
     */
-  def update = Action.async(parse.json) { request =>
-    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { detail =>
-      val balanceAndId = accRepository.update(detail)
-      balanceAndId._2 map { id =>
-        Ok(successResponse(
-          JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
-          Messages("修改成功")))
-      }
-    })
-  }
+//  def update = Action.async(parse.json) { request =>
+//    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { detail =>
+//      val balanceAndId = accRepository.update(detail)
+//      balanceAndId._2 map { id =>
+//        Ok(successResponse(
+//          JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
+//          Messages("detail.success.updated")))
+//      }
+//    })
+//  }
 
   private def successResponse(data: JsValue, message: String) = {
     obj("status" -> SUCCESS, "data" -> data, "msg" -> message)

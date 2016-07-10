@@ -5,9 +5,10 @@ CREATE TABLE "account"(
     "io" varchar(10)  ,
     "amount" REAL,
     "balance" REAL,
-    "reason" varchar);
+    "reason" varchar,
+    "whetherLatest" INTEGER);
 
-INSERT INTO "account" values (1,'1',"收入", 1,1,'吃饭');
+---!INSERT INTO "account" values (1,'1',"收入", 1,1,'吃饭',1);
 
 ---!Downs
 

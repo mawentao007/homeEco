@@ -6,8 +6,18 @@ var serverErrorMessage = 'Oops, something wrong :(';
 
 $(document).ready(function() {
     $('#accountDataTable').DataTable( {
+
+    //定义某些列可以排序
+        "columnDefs": [
+              { "sortable": false, "targets": [1,2,3,4] },
+              { "visible" : false, "targets": [5]},
+              {"className": "dt-center", "targets": "_all"}  //获取所有目标
+           ],
+
+        "order": [[ 6, 'asc' ]],
+
         "ajax": {
-            "url": "/emp/list",
+            "url": "/detail/list",
             "dataType": "json"
         },
          "columns": [
@@ -16,32 +26,45 @@ $(document).ready(function() {
                     { "data": "amount" },
                     { "data": "balance" },
                     { "data": "reason" },
-                    { data: "id" ,
-                     "render": function ( data) {
-                                  return '<i id=" ' + data +' " class="edit-button glyphicon glyphicon-edit cursorPointer" ></i>';
-                                }
-                            },
+                    { "data": "whetherLatest"},
+                    //TODO 编辑功能暂时不开通
+//                    {  data: "id" ,
+//                     "render": function ( data,type,full) {             //通过full可以访问所有字段,注意参数必须是三个固定
+//                                  if(full.whetherLatest == 1){
+//                                    return '<i id=" ' + data +' " class="edit-button glyphicon glyphicon-edit cursorPointer" ></i>';
+//                                  }else{
+//                                    return '<i id=" ' + data +' " class="" ></i>'
+//                                  }
+//                                }
+//                            },
                      { data: "id" ,
-                        "render": function ( data ) {
-                                   return '<i id=" ' + data +' " class="remove-button glyphicon glyphicon-trash cursorPointer"></i>';
-                               }
+                        "render": function ( data,type,full ) {
+                                    if(full.whetherLatest == 1){
+                                        return '<i id=" ' + data +' " class="remove-button glyphicon glyphicon-trash cursorPointer"> ' + data + '</i>';
+                                    }else{
+                                        return '<i id= ' + data + ' >' +  data + '</i>'
+                                    }
+
+                        }
                      }
 
                 ]
+
+
     } );
 
     var tableAccount = $('#accountDataTable').DataTable();
 
-    // Delete employee event
+    // 删除条目
     $("body").on( 'click', '.remove-button', function () {
         var currentRow = $(this);
-        var employeeId = $(this).attr('id').trim();
+        var detailId = $(this).attr('id').trim();
          bootbox.confirm("确定删除该条目?", function(result) {
             if(result) {
                     $.ajax({
-                     url: "/emp/delete",
+                     url: "/detail/delete",
                      type: "GET",
-                     data: {empId: employeeId},
+                     data: {detId: detailId},
                      success:function(response){
                                if(response.status == SUCCESS) {
                                   showSuccessAlert(response.msg);
@@ -61,17 +84,17 @@ $(document).ready(function() {
     });
      
 
-     // Edit employee event
+     // 编辑条目
      $("body").on( 'click', '.edit-button', function () {
-            var employeeId = $(this).attr('id').trim();
+            var detailId = $(this).attr('id').trim();
              $.ajax({
-                   url: "/emp/edit",
+                   url: "/detail/edit",
                    type: "GET",
-                   data: {empId: employeeId},
+                   data: {detId: detailId},
                    success:function(response){
-                             $('#empEditModal').modal('show');
+                             $('#detailEditModal').modal('show');
                              $.each(response.data, function(key, value){
-                                $('#empEditForm input[name="'+key+'"]').val(value);
+                                $('#detailEditForm input[name="'+key+'"]').val(value);
                              });
                       },
                    error: function(){
@@ -81,7 +104,7 @@ $(document).ready(function() {
           });
 
 
-$('#empModal').on('shown.bs.modal', function () {
+$('#detailModal').on('shown.bs.modal', function () {
   $('#accountForm').trigger("reset");
 });
 
@@ -106,7 +129,7 @@ $.fn.serializeObject = function() {
                         }
                         o[this.name].push(this.value || '');
                     } else {
-                          if(this.name == 'id'){
+                          if(this.name == 'id'| this.name == 'whetherLatest'){
                                 o[this.name] = parseInt(this.value);
                           } else if (this.name == 'amount') {
                                 o[this.name] = parseFloat(this.value);
@@ -118,32 +141,33 @@ $.fn.serializeObject = function() {
             return JSON.stringify(o);
         };
 
-// Handling form submission for create new employee
-      $('#accountForm').on('submit', function(e){
-         var formData = $("#accountForm").serializeObject();
-         var empTable = $('#accountDataTable').dataTable();
+// 提交新条目的处理请求
+      $('#detailForm').on('submit', function(e){
+         var formData = $("#detailForm").serializeObject();
+         var detailTable = $('#accountDataTable').dataTable();
           e.preventDefault();
            $.ajax({
-                url: "/emp/create",
+                url: "/detail/create",
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 data: formData,
                 success:function(response){
                    if(response.status == "success") {
-                         $('#empModal').modal('hide');
-                         var newEmp = jQuery.parseJSON(formData);
-                         newEmp['id'] = response.data['id'];
-                         newEmp['balance'] = response.data['balance']
-                         empTable.fnAddData([newEmp]);
+                         $('#detailModal').modal('hide');
+                         var newDet = jQuery.parseJSON(formData);
+                         newDet['id'] = response.data['id'];
+                         newDet['balance'] = response.data['balance']
+                         newDet['whetherLatest'] = 1
+                         detailTable.fnAddData([newDet]);
                          showSuccessAlert(response.msg);
                    } else {
-                        $('#empModal').modal('hide');
+                        $('#detailModal').modal('hide');
                         showErrorAlert(response.msg);
                    }
                 },
                 error: function(){
-                    $('#empModal').modal('hide');
+                    $('#detailModal').modal('hide');
                     showErrorAlert(serverErrorMessage);
                 }
 
@@ -151,28 +175,28 @@ $.fn.serializeObject = function() {
             return false;
       });
 
-// Handling form submission for update employee
-$('#empEditForm').on('submit', function(e){
-               var formData = $("#empEditForm").serializeObject();
+// 处理条目更新请求
+$('#detailEditForm').on('submit', function(e){
+               var formData = $("#detailEditForm").serializeObject();
                 e.preventDefault();
                  $.ajax({
-                      url: "/emp/update",
+                      url: "/detail/update",
                       type: "POST",
                       contentType: "application/json; charset=utf-8",
                       dataType: "json",
                       data: formData,
                       success:function(response){
                          if(response.status == SUCCESS) {
-                               $('#empEditModal').modal('hide');
+                               $('#detailEditModal').modal('hide');
                                $('#accountDataTable').DataTable().ajax.reload();
                                showSuccessAlert(response.msg)
                          } else {
-                            $('#empEditModal').modal('hide');
+                            $('#detailEditModal').modal('hide');
                             showErrorAlert(response.msg);
                          }
                       },
                       error: function(){
-                          $('#empEditModal').modal('hide');
+                          $('#detailEditModal').modal('hide');
                           showErrorAlert(serverErrorMessage);
                       }
 

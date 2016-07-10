@@ -8,8 +8,9 @@ case class Detail(date: String,
                   amount: Double,
                   balance:Option[Double]=None,
                   reason:String,
-                  id: Option[Int]=None
-                    )
+                  whetherLatest:Option[Int] = None ,
+                  id: Option[Int]=None          //注意option类型导致的数据丢失
+                 )
 
 
 
