@@ -23,4 +23,8 @@ logs/*
 /bin/
 .cache-main
 .cache-tests
+conf/db/homeEco.db
 
+conf/db/
+logs/
+project/project/
