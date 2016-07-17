@@ -159,11 +159,17 @@ $.fn.serializeObject = function() {
                          $('#detailModal').modal('hide');
 
                          //添加一行新的数据，用dataTable对象操作
-                         /*var newDet = jQuery.parseJSON(formData);
+                         var newDet = jQuery.parseJSON(formData);
                          newDet['id'] = response.data['id'];
                          newDet['balance'] = response.data['balance']
                          newDet['whetherLatest'] = 1
-                         detailTable.fnAddData([newDet]);*/
+                         detailTable.fnAddData([newDet]);
+
+                         //通过cell访问单个节点值
+                         //alert(detailTable.api().cell(1,1).data());
+                         //更新某个节点值
+                         //detailTable.fnUpdate(0,detailTable.api().data().count()-2,7);
+
 
                          //更新整个表
                          $('#accountDataTable').DataTable().ajax.reload();

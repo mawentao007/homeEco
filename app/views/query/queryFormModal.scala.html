@@ -2,32 +2,34 @@
 @(param: Any)
 
 <!-- Button trigger modal -->
-<button style="padding: 5px 29px !important;" type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#detailModal">
-    添加收支条目
+<button style="padding: 5px 29px !important;" type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#queryModal">
+    查询
 </button>
 
-<a style="padding: 5px 29px !important;"  class="btn btn-success btn-lg" href='@routes.QueryController.queryIndex()'>
-    查询账单
-</a>
 
 
-<form id="detailForm" role="form">
-    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+<form id="queryForm" role="form">
+    <div class="modal fade" id="queryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">账目详情</h4>
+                    <h4 class="modal-title" id="myModalLabel">查询条件</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="date">日期</label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="日期"  required>
+                        <label for="beginDate">起始日期</label>
+                        <input type="date" class="form-control" id="beginDate" name="beginDate" placeholder="起始日期" >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">截止日期</label>
+                        <input type="date" class="form-control" id="endDate" name="beginDate" placeholder="截止日期" >
                     </div>
 
                     <div class="form-group">
                         <label for="user">用户</label>
-                        <select  class="form-control" id="user" name="user" placeholder="用户" default="粟样丹" required>
+                        <select  class="form-control" id="user" name="user" placeholder="用户" default="粟样丹">
                             <option value="粟样丹">粟样丹</option>
                             <option value="Marvin">Marvin</option>
                         </select>
@@ -35,26 +37,26 @@
 
                     <div class="form-group">
                         <label for="io">收入/支出</label>
-                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" default="支出" required>
+                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" default="支出">
                             <option value="收入">收入</option>
                             <option value="支出">支出</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="amount">数目</label>
-                        <input type="number" class="form-control" step="0.01" id="amount"  name="amount" placeholder="数额" required>
-                    </div>
+                    @*<div class="form-group">*@
+                        @*<label for="amount">数目</label>*@
+                        @*<input type="number" class="form-control" step="0.01" id="amount"  name="amount" placeholder="数额" required>*@
+                    @*</div>*@
 
                 <!--    <div class="form-group">
                         <label for="balance">Balance</label>
                         <input type="number" class="form-control" step="0.01" id="balance"  name="balance" placeholder="Balance" required>
                     </div>-->
 
-                    <div class="form-group">
-                        <label for="reason">备注</label>
-                        <input type="text" class="form-control" id="reason"  name="reason" placeholder="备注" required>
-                    </div>
+                    @*<div class="form-group">*@
+                        @*<label for="reason">备注</label>*@
+                        @*<input type="text" class="form-control" id="reason"  name="reason" placeholder="备注" required>*@
+                    @*</div>*@
 
 
 
