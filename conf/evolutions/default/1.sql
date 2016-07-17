@@ -2,6 +2,7 @@
 CREATE TABLE "account"(
     "id" INTEGER NOT NULL PRIMARY KEY ,
     "date" varchar ,
+    "user" varchar,
     "io" varchar(10)  ,
     "amount" REAL,
     "balance" REAL,

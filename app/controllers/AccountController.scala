@@ -46,6 +46,7 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
           JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
             Messages("成功创建条目")))
       }
+      //Redirect("/detail/list")
     })
   }
 

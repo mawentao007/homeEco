@@ -9,8 +9,8 @@ $(document).ready(function() {
 
     //定义某些列可以排序
         "columnDefs": [
-              { "sortable": false, "targets": [1,2,3,4] },
-              { "visible" : false, "targets": [5]},
+              { "sortable": false, "targets": [1,2,3,4,5] },
+              { "visible" : false, "targets": [6]},
               {"className": "dt-center", "targets": "_all"}  //获取所有目标
            ],
 
@@ -22,6 +22,7 @@ $(document).ready(function() {
         },
          "columns": [
                     { "data": "date" },
+                    { "data": "user"},
                     { "data": "io" },
                     { "data": "amount" },
                     { "data": "balance" },
@@ -145,6 +146,7 @@ $.fn.serializeObject = function() {
       $('#detailForm').on('submit', function(e){
          var formData = $("#detailForm").serializeObject();
          var detailTable = $('#accountDataTable').dataTable();
+          //dataTable返回jq对象，DataTable是新对象，包含一系列api。可以不用这个，而用dataTable.api()访问。
           e.preventDefault();
            $.ajax({
                 url: "/detail/create",
@@ -155,12 +157,23 @@ $.fn.serializeObject = function() {
                 success:function(response){
                    if(response.status == "success") {
                          $('#detailModal').modal('hide');
-                         var newDet = jQuery.parseJSON(formData);
+
+                         //添加一行新的数据，用dataTable对象操作
+                         /*var newDet = jQuery.parseJSON(formData);
                          newDet['id'] = response.data['id'];
                          newDet['balance'] = response.data['balance']
                          newDet['whetherLatest'] = 1
-                         detailTable.fnAddData([newDet]);
+                         detailTable.fnAddData([newDet]);*/
+
+                         //更新整个表
+                         $('#accountDataTable').DataTable().ajax.reload();
+                         //清空列表
+                       // detailTable.fnClearTable();
+
+
                          showSuccessAlert(response.msg);
+                         //重定向链接
+                       // location.href = "http://127.0.0.1:9000"
                    } else {
                         $('#detailModal').modal('hide');
                         showErrorAlert(response.msg);

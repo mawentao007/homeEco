@@ -32,13 +32,13 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
       if(detail.io == "收入"){
         val fId = db.run {
           accountTableQueryInc +=
-            Detail(detail.date, detail.io, detail.amount, Some(detail.amount), detail.reason,Some(1))
+            Detail(detail.date, detail.io, detail.amount, Some(detail.amount), detail.reason,detail.user,Some(1))
         }
         (detail.amount,fId)
       }else{
         val fId = db.run {
           accountTableQueryInc +=
-            Detail(detail.date, detail.io, detail.amount, Some(-detail.amount), detail.reason,Some(1))
+            Detail(detail.date, detail.io, detail.amount, Some(-detail.amount), detail.reason,detail.user,Some(1))
         }
         (-detail.amount,fId)
       }
@@ -56,14 +56,14 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
 
       val fId = db.run {
         accountTableQueryInc +=
-          Detail(detail.date, detail.io, detail.amount, Some(newBalance), detail.reason,Some(1))
+          Detail(detail.date, detail.io, detail.amount, Some(newBalance), detail.reason,detail.user,Some(1))
       }
 
       //更新之前行
       //更新时候注意提供带有id的完整数据
       db.run{
         accountTableQuery.filter(_.id === lastId).update(
-          Detail(lastRow.date,lastRow.io,lastRow.amount,lastRow.balance,lastRow.reason,Some(0),lastId)
+          Detail(lastRow.date,lastRow.io,lastRow.amount,lastRow.balance,lastRow.reason,detail.user,Some(0),lastId)
         )
       }
       (newBalance,fId)
@@ -80,9 +80,6 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
   /**
     * 只能修改列表结尾的条目，历史账单无法修改
     * 更新历史条目的功能废弃,因为余额的处理比较麻烦。可以考虑只允许更新reason等内容。
-    *
-    * @param
-    * @return
     */
 //  def update(detail: Detail): (Double,Future[Int]) = {
 //    db.run {
@@ -122,6 +119,7 @@ private[repo] trait AccountTable {
     def amount = column[Double]("amount")  //double可以避免float引起的精度偏移
     def balance = column[Double]("balance")
     def reason = column[String]("reason")
+    def user = column[String]("user")
     def whetherLatest = column[Int]("whetherLatest")
     def id = column[Int]("id",O.AutoInc,O.PrimaryKey)
 
@@ -129,7 +127,7 @@ private[repo] trait AccountTable {
 
     //def emailUnique = index("email_unique_key", email, unique = true)
 
-    def * = (date, io, amount, balance.?,reason, whetherLatest.?,id.?) <>( Detail.tupled,Detail.unapply)
+    def * = (date, io, amount, balance.?,reason,user,whetherLatest.?,id.?) <>( Detail.tupled,Detail.unapply)
     /**
       * 自定义映射的方法
       * def * = (date, io, amount, balance,reason, id.?).shaped.<>(

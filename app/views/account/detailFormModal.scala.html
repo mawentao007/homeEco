@@ -17,20 +17,28 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="日期" default="" required>
+                        <label for="date">日期</label>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="日期"  required>
                     </div>
 
                     <div class="form-group">
-                        <label for="io">IO</label>
-                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" required>
+                        <label for="user">用户</label>
+                        <select  class="form-control" id="user" name="user" placeholder="用户" default="粟样丹" required>
+                            <option value="粟样丹">粟样丹</option>
+                            <option value="Marvin">Marvin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="io">收入/支出</label>
+                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" default="支出" required>
                             <option value="收入">收入</option>
                             <option value="支出">支出</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="amount">Amount</label>
+                        <label for="amount">数目</label>
                         <input type="number" class="form-control" step="0.01" id="amount"  name="amount" placeholder="数额" required>
                     </div>
 
@@ -40,7 +48,7 @@
                     </div>-->
 
                     <div class="form-group">
-                        <label for="reason">reason</label>
+                        <label for="reason">备注</label>
                         <input type="text" class="form-control" id="reason"  name="reason" placeholder="备注" required>
                     </div>
 
