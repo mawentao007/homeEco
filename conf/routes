@@ -17,7 +17,6 @@ GET     /detail/edit                           controllers.AccountController.edi
 GET     /detail/delete                         controllers.AccountController.delete(detId: Int)
 
 
-GET     /queryIndex                           controllers.QueryController.queryIndex()
 
 
 POST    /query                                controllers.QueryController.query

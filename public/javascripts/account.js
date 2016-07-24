@@ -6,6 +6,7 @@ var serverErrorMessage = 'Oops, something wrong :(';
 
 $(document).ready(function() {
     $('#accountDataTable').DataTable( {
+        destroy: true,
 
     //定义某些列可以排序
         "columnDefs": [

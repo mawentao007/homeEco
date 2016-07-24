@@ -1,16 +1,22 @@
 
 @import views.html.account._
 
+@import views.html.query._
+
 @main("小马哥家的财务记录") {
 
 <!-- Populate employee table -->
-@detailList(" ")
+    @detailList(" ")
 
 <!-- Populate employee form modal -->
-@detailFormModal(" ")
+    @detailFormModal(" ")
 
 <!-- Populate employee edit form modal -->
-@editDetailModal(" ")
+    @editDetailModal(" ")
+
+    @queryFormModal(" ")
+
+
 
 }
 

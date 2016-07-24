@@ -25,17 +25,35 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
 
   val logger = Logger(this.getClass())
 
-  def queryIndex() = Action{
-    Ok(html.queryIndex())
-  }
 
   /**
     * Handles request for getting all account from the database
     */
   def query() = Action.async(parse.json) { request =>
-    request.body.validate[(String,String,String,String)].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
-      case (bdate,edate,user,io) =>
-        accRepository.querySql(bdate,edate,user,io) map { details =>
+    request.body.validate[(String,String)].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
+      case (bdate,edate) =>
+        accRepository.querySql(bdate,edate) map { details =>
+          //income part
+          val allIncome = details.filter(_.io == "收入")
+          val suIncome = allIncome.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
+          val maIncome = allIncome.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
+          val incomeAmount = allIncome.map(_.amount).foldRight(0.0)(_ + _)
+
+          //expense part
+          val allExpense = details.filter(_.io == "支出")
+          val suExpense = allExpense.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
+          val maExpense = allExpense.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
+          val expenseAmount = allExpense.map(_.amount).foldRight(0.0)(_ + _)
+
+          val suNetIncome = suIncome - suExpense
+          val maNetIncome = maIncome - maExpense
+          val netIncome = incomeAmount - expenseAmount
+
+
+          logger.info("su income " + suIncome + " ma income " + maIncome + " su Expense " + suExpense + " ma expense " + maExpense + " netincome " + netIncome + " ma net income " +
+            maNetIncome + " su net income " + suNetIncome)
+
+
           Ok(successResponse(
             JsObject(Seq("test"->JsNumber(10),"detail" -> Json.toJson(details))),
               Messages("detail.success.detailList")))
@@ -101,9 +119,9 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
     //readNullable 读取Option类型
     //    (JsPath \ "beginDate").readNullable[String] and
         (JsPath \ "beginDate").read[String] and
-        (__ \ 'endDate).read[String] and
-        (__ \'user).read[String] and
-        (__ \'io).read[String]
+        (__ \ 'endDate).read[String]
+//        (__ \'user).read[String] and
+//        (__ \'io).read[String]
     ) tupled
 
 }

@@ -5,39 +5,6 @@ var ERROR = 'error';
 var serverErrorMessage = 'Oops, something wrong :(';
 
 $(document).ready(function() {
-    $('#queryDataTable').DataTable( {
-
-        //用完即摧毁
-        destroy: true,
-
-        //定义某些列可以排序
-        "columnDefs": [
-            { "sortable": false, "targets": [1,2,3,4,5] },
-            { "visible" : false, "targets": [6]},
-            {"className": "dt-center", "targets": "_all"}  //获取所有目标
-        ],
-
-        "order": [[ 6, 'asc' ]],
-
-        "ajax": {
-            "url": "/detail/list",
-            "dataType": "json"
-        },
-        "columns": [
-            { "data": "date" },
-            { "data": "user"},
-            { "data": "io" },
-            { "data": "amount" },
-            { "data": "balance" },
-            { "data": "reason" },
-            { "data": "whetherLatest"},
-            { "data": "id" }
-        ]
-    } );
-
-
-
-
 
 
 $('#queryModal').on('shown.bs.modal', function () {
@@ -91,7 +58,7 @@ $.fn.serializeObject = function() {
                 success:function(response){
                    if(response.status == "success") {
                        $('#queryModal').modal('hide');
-                       $('#queryDataTable').DataTable( {
+                       $('#accountDataTable').DataTable( {
 
                            //用完即摧毁
                            destroy: true,

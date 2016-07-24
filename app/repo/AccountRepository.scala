@@ -85,14 +85,14 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
     * @param endDate
     * @return
     */
-  def querySql(beginDate:String,endDate:String,user:String,io:String) ={
+  def querySql(beginDate:String,endDate:String) ={
     var query = accountTableQuery.filter(x =>(x.date >= beginDate && x.date <= endDate))
-    if(user != "所有"){
-      query = query.filter(_.user === user)
-    }
-    if(io != "所有类型"){
+//    if(user != "所有"){
+//      query = query.filter(_.user === user)
+//    }
+   /* if(io != "所有类型"){
       query = query.filter(_.io === io)
-    }
+    }*/
 
     db.run{
       query.to[List].result
