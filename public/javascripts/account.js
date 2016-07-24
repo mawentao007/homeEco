@@ -173,7 +173,7 @@ $.fn.serializeObject = function() {
 
 
                          //更新整个表
-                         $('#accountDataTable').DataTable().ajax.reload();
+                         //$('#accountDataTable').DataTable().ajax.reload();
                          //清空列表
                        // detailTable.fnClearTable();
 

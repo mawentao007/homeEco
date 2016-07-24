@@ -54,8 +54,31 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
             maNetIncome + " su net income " + suNetIncome)
 
 
+          val incomeJson = Json.arr(
+            Json.obj("name"-> "粟样丹收入","y" -> suIncome),
+            Json.obj("name"-> "马文韬收入","y" -> maIncome)
+          )
+
+          val expenseJson = Json.arr(
+            Json.obj("name"-> "粟样丹支出","y" -> suExpense),
+            Json.obj("name"-> "马文韬支出","y" -> maExpense)
+          )
+
+          val netIncomeJson = Json.arr(
+          Json.obj("name"-> "粟样丹净收入","y" -> suNetIncome),
+          Json.obj("name"-> "马文韬净收入","y" -> maNetIncome)
+        )
+
           Ok(successResponse(
-            JsObject(Seq("test"->JsNumber(10),"detail" -> Json.toJson(details))),
+            JsObject(
+              Seq(
+                "incomeJson"->incomeJson,
+                "expenseJson"-> expenseJson,
+                "netIncomeJson" -> netIncomeJson,
+                "detail" -> Json.toJson(details)
+              )
+
+            ),
               Messages("detail.success.detailList")))
         }
     })
