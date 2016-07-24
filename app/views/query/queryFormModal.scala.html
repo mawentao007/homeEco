@@ -19,27 +19,29 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="beginDate">起始日期</label>
-                        <input type="date" class="form-control" id="beginDate" name="beginDate" placeholder="起始日期" >
+                        <input type="date" class="form-control" id="beginDate" name="beginDate" placeholder="起始日期" required >
                     </div>
 
                     <div class="form-group">
                         <label for="endDate">截止日期</label>
-                        <input type="date" class="form-control" id="endDate" name="beginDate" placeholder="截止日期" >
+                        <input type="date" class="form-control" id="endDate" name="endDate" placeholder="截止日期"  required>
                     </div>
 
                     <div class="form-group">
                         <label for="user">用户</label>
-                        <select  class="form-control" id="user" name="user" placeholder="用户" default="粟样丹">
+                        <select  class="form-control" id="user" name="user" placeholder="user" default="粟样丹"  required>
                             <option value="粟样丹">粟样丹</option>
                             <option value="Marvin">Marvin</option>
+                            <option value="Marvin">所有</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="io">收入/支出</label>
-                        <select  class="form-control" id="io" name="io" placeholder="收入/支出" default="支出">
+                        <select  class="form-control" id="io" name="io" placeholder="io" default="所有类型"  required >
                             <option value="收入">收入</option>
                             <option value="支出">支出</option>
+                            <option value="所有类型">所有类型</option>
                         </select>
                     </div>
 

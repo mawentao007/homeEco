@@ -2,7 +2,6 @@ package repo
 
 import javax.inject.{Inject, Singleton}
 
-
 import scala.concurrent.duration._
 import models.Detail
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -10,6 +9,8 @@ import slick.driver.JdbcProfile
 
 import scala.concurrent.{Await, Future}
 import play.api.Logger
+import slick.lifted.CanBeQueryCondition
+import slick.model.Column
 
 
 @Singleton()
@@ -77,18 +78,32 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
     accountTableQueryInc ++= details
   }
 
-  /**
-    * 只能修改列表结尾的条目，历史账单无法修改
-    * 更新历史条目的功能废弃,因为余额的处理比较麻烦。可以考虑只允许更新reason等内容。
-    */
-//  def update(detail: Detail): (Double,Future[Int]) = {
-//    db.run {
-//      accountTableQuery.filter(_.id === detail.id).delete
-//    }
-//    insert(detail)
-//  }
 
-//TODO 删除条目之后需要更新最后一个条目的whetherLatest字段
+  /**
+    * 根据起始和终止时间筛选条目,包含起始和终止时间
+    * @param beginDate
+    * @param endDate
+    * @return
+    */
+  def querySql(beginDate:String,endDate:String,user:String,io:String) ={
+    var query = accountTableQuery.filter(x =>(x.date >= beginDate && x.date <= endDate))
+    if(user != "所有"){
+      query = query.filter(_.user === user)
+    }
+    if(io != "所有类型"){
+      query = query.filter(_.io === io)
+    }
+
+    db.run{
+      query.to[List].result
+    }
+  }
+
+
+
+
+
+
   def delete(id: Int): Future[Int] = db.run {
       accountTableQuery.filter(_.id === id).filter(_.whetherLatest === 1).delete
   }

@@ -90,7 +90,7 @@ $.fn.serializeObject = function() {
                 data: formData,
                 success:function(response){
                    if(response.status == "success") {
-                         $('#queryModal').modal('hide');
+                       $('#queryModal').modal('hide');
                        $('#queryDataTable').DataTable( {
 
                            //用完即摧毁
@@ -106,7 +106,7 @@ $.fn.serializeObject = function() {
                            "order": [[ 6, 'asc' ]],
 
                            //直接利用返回结果
-                           data:response.data,
+                           data:response.data.detail,
 
 
                            "columns": [
@@ -120,6 +120,7 @@ $.fn.serializeObject = function() {
                                { "data": "id" }
                            ]
                        } );
+
 
 
 

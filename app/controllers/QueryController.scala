@@ -6,12 +6,13 @@ import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json._
-import play.api.libs.json._
+import play.api.libs.json.{JsObject, _}
 import play.api.mvc._
 import repo.AccountRepository
 import utils.Constants
 import utils.JsonFormat._
 import views.html
+import play.api.libs.functional.syntax._
 
 import scala.concurrent.Future
 
@@ -31,13 +32,18 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
   /**
     * Handles request for getting all account from the database
     */
-  def query() = Action.async {
-    accRepository.getAll().map { res =>
-      //logger.info("acc json list: " + Json.toJson(res))
-      Ok(successResponse(Json.toJson(res), Messages("detail.success.detailList")))
-    }
+  def query() = Action.async(parse.json) { request =>
+    request.body.validate[(String,String,String,String)].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
+      case (bdate,edate,user,io) =>
+        accRepository.querySql(bdate,edate,user,io) map { details =>
+          Ok(successResponse(
+            JsObject(Seq("test"->JsNumber(10),"detail" -> Json.toJson(details))),
+              Messages("detail.success.detailList")))
+        }
+    })
   }
 
+  //JsObject(Seq("key" -> JsObject))
   /**
     * Handles request for creation of new account
     */
@@ -85,23 +91,20 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
     obj("status" -> ERROR, "data" -> data, "msg" -> message)
   }
 
-  /**
-    * Handles request for update existing account
-    */
-//  def update = Action.async(parse.json) { request =>
-//    request.body.validate[Detail].fold(error => Future.successful(BadRequest(JsError.toJson(error))), { detail =>
-//      val balanceAndId = accRepository.update(detail)
-//      balanceAndId._2 map { id =>
-//        Ok(successResponse(
-//          JsObject(Seq("balance" -> JsNumber(balanceAndId._1),"id" -> JsNumber(id))),
-//          Messages("detail.success.updated")))
-//      }
-//    })
-//  }
+
 
   private def successResponse(data: JsValue, message: String) = {
     obj("status" -> SUCCESS, "data" -> data, "msg" -> message)
   }
+
+  implicit val queryFormJson = (
+    //readNullable 读取Option类型
+    //    (JsPath \ "beginDate").readNullable[String] and
+        (JsPath \ "beginDate").read[String] and
+        (__ \ 'endDate).read[String] and
+        (__ \'user).read[String] and
+        (__ \'io).read[String]
+    ) tupled
 
 }
 
