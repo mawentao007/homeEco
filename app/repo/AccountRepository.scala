@@ -33,13 +33,13 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
       if(detail.io == "收入"){
         val fId = db.run {
           accountTableQueryInc +=
-            Detail(detail.date, detail.io, detail.amount, Some(detail.amount), detail.reason,detail.user,Some(1))
+            Detail(detail.date, detail.io, detail.kind, detail.amount, Some(detail.amount), detail.reason,detail.user,Some(1))
         }
         (detail.amount,fId)
       }else{
         val fId = db.run {
           accountTableQueryInc +=
-            Detail(detail.date, detail.io, detail.amount, Some(-detail.amount), detail.reason,detail.user,Some(1))
+            Detail(detail.date, detail.io, detail.kind, detail.amount, Some(-detail.amount), detail.reason,detail.user,Some(1))
         }
         (-detail.amount,fId)
       }
@@ -57,14 +57,14 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
 
       val fId = db.run {
         accountTableQueryInc +=
-          Detail(detail.date, detail.io, detail.amount, Some(newBalance), detail.reason,detail.user,Some(1))
+          Detail(detail.date, detail.io, detail.kind, detail.amount, Some(newBalance), detail.reason,detail.user,Some(1))
       }
 
       //更新之前行
       //更新时候注意提供带有id的完整数据
       db.run{
         accountTableQuery.filter(_.id === lastId).update(
-          Detail(lastRow.date,lastRow.io,lastRow.amount,lastRow.balance,lastRow.reason,detail.user,Some(0),lastId)
+          Detail(lastRow.date,lastRow.io, lastRow.kind, lastRow.amount,lastRow.balance,lastRow.reason,detail.user,Some(0),lastId)
         )
       }
       (newBalance,fId)
@@ -131,6 +131,7 @@ private[repo] trait AccountTable {
   class accountTable(tag: Tag) extends Table[Detail](tag, "account") {
     def date = column[String]("date")
     def io = column[String]("io")
+    def kind = column[String]("kind")
     def amount = column[Double]("amount")  //double可以避免float引起的精度偏移
     def balance = column[Double]("balance")
     def reason = column[String]("reason")
@@ -142,7 +143,7 @@ private[repo] trait AccountTable {
 
     //def emailUnique = index("email_unique_key", email, unique = true)
 
-    def * = (date, io, amount, balance.?,reason,user,whetherLatest.?,id.?) <>( Detail.tupled,Detail.unapply)
+    def * = (date, io, kind, amount, balance.?,reason,user,whetherLatest.?,id.?) <>( Detail.tupled,Detail.unapply)
     /**
       * 自定义映射的方法
       * def * = (date, io, amount, balance,reason, id.?).shaped.<>(

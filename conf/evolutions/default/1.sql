@@ -4,6 +4,7 @@ CREATE TABLE "account"(
     "date" varchar ,
     "user" varchar,
     "io" varchar(10)  ,
+    "kind" varchar(10)  ,
     "amount" REAL,
     "balance" REAL,
     "reason" varchar,

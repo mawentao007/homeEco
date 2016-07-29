@@ -67,7 +67,9 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
           val netIncomeJson = Json.arr(
           Json.obj("name"-> "粟样丹净收入","y" -> suNetIncome),
           Json.obj("name"-> "马文韬净收入","y" -> maNetIncome)
-        )
+          )
+
+          val expenseByType = allExpense.groupBy(_.kind)
 
           Ok(successResponse(
             JsObject(

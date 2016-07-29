@@ -70,8 +70,8 @@ $(document).ready(function () {
 
                         //定义某些列可以排序
                         "columnDefs": [
-                            {"sortable": false, "targets": [1, 2, 3, 4, 5]},
-                            {"visible": false, "targets": [6]},
+                            {"sortable": false, "targets": [1, 2, 3, 4, 5, 6]},
+                            {"visible": false, "targets": [7]},
                             {"className": "dt-center", "targets": "_all"}  //获取所有目标
                         ],
 
@@ -85,6 +85,7 @@ $(document).ready(function () {
                             {"data": "date"},
                             {"data": "user"},
                             {"data": "io"},
+                            {"data": "kind"},
                             {"data": "amount"},
                             {"data": "balance"},
                             {"data": "reason"},

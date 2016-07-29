@@ -5,6 +5,7 @@ package models
 
 case class Detail(date: String,
                   io: String,
+                  kind:String,
                   amount: Double,
                   balance:Option[Double]=None,
                   reason:String,
