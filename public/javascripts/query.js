@@ -70,12 +70,12 @@ $(document).ready(function () {
 
                         //定义某些列可以排序
                         "columnDefs": [
-                            {"sortable": false, "targets": [1, 2, 3, 4, 5, 6]},
+                            {"sortable": false, "targets": [0, 1, 2, 3, 4, 5, 6 ,8]},
                             {"visible": false, "targets": [7]},
                             {"className": "dt-center", "targets": "_all"}  //获取所有目标
                         ],
 
-                        "order": [[6, 'asc']],
+                        "order": [[8, 'asc']],
 
                         //直接利用返回结果
                         data: response.data.detail,
@@ -94,9 +94,10 @@ $(document).ready(function () {
                         ]
                     });
 
-                    showChart('#income_container',response.data.incomeJson,"");
-                    showChart('#expense_container',response.data.expenseJson,"");
-                    showChart('#netIncome_container',response.data.netIncomeJson,"");
+                    showChart('#income_container',response.data.incomeJson,"收入");
+                    showChart('#expense_container',response.data.expenseJson,"支出");
+                    showChart('#netIncome_container',response.data.netIncomeJson,"净收入");
+                    showChart('#kind_container',response.data.kindJson,"分类支出");
 
 
                     // //添加一行新的数据，用dataTable对象操作

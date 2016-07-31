@@ -14,6 +14,7 @@ import utils.JsonFormat._
 import views.html
 import play.api.libs.functional.syntax._
 
+import scala.collection.mutable
 import scala.concurrent.Future
 
 /**
@@ -69,7 +70,18 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
           Json.obj("name"-> "马文韬净收入","y" -> maNetIncome)
           )
 
-          val expenseByType = allExpense.groupBy(_.kind)
+          val kindExpenses:mutable.HashMap[String,Double] = mutable.HashMap()
+          allExpense.groupBy(_.kind).foreach{
+            case(kind,rows) =>
+              kindExpenses.put(kind,rows.map(_.amount).foldRight(0.0)(_ + _))
+          }
+
+          val kindExpenseJson = Json.toJson(
+            kindExpenses.map{
+              case(k,v) => Json.obj("name" -> k,"y" -> v)
+            }
+          )
+
 
           Ok(successResponse(
             JsObject(
@@ -77,7 +89,8 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
                 "incomeJson"->incomeJson,
                 "expenseJson"-> expenseJson,
                 "netIncomeJson" -> netIncomeJson,
-                "detail" -> Json.toJson(details)
+                "detail" -> Json.toJson(details),
+                "kindJson" -> kindExpenseJson
               )
 
             ),
