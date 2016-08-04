@@ -94,9 +94,10 @@ $(document).ready(function () {
                         ]
                     });
 
-                    showChart('#income_container',response.data.incomeJson,"收入");
-                    showChart('#expense_container',response.data.expenseJson,"支出");
-                    showChart('#kind_container',response.data.kindJson,"分类支出");
+                    showPieChart('#income_container',response.data.incomeJson,"收入");
+                    showPieChart('#expense_container',response.data.expenseJson,"支出");
+                    showPieChart('#kind_container',response.data.kindJson,"分类支出");
+                    showColumnChart('#range_container',response.data.xAxisJson,response.data.yDataJson,"趋势图")
                 } else {
                     $('#queryModal').modal('hide');
                     showErrorAlert(response.msg);
@@ -112,7 +113,7 @@ $(document).ready(function () {
     });
 
 
-    var showChart = function (divId,chartData,title) {
+    var showPieChart = function (divId,chartData,title) {
         $(divId).highcharts({
             chart: {
                 plotBackgroundColor: null,
@@ -147,6 +148,34 @@ $(document).ready(function () {
         });
     };
 
+    var showColumnChart = function (divId,xJson,yJson,title) {
+        $(divId).highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'column'
+            },
+            title: {
+                text: title
+            },
 
+            plotOptions: {
+                series: {
+                    allowPointSelect: true
+                }
+            },
+
+            xAxis: {
+                categories: xJson
+            },
+
+            series: [{
+                name: '金额',
+                colorByPoint: true,
+                data: yJson
+            }]
+        });
+    };
 });
 
