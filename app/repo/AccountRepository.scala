@@ -64,7 +64,7 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
       //更新时候注意提供带有id的完整数据
       db.run{
         accountTableQuery.filter(_.id === lastId).update(
-          Detail(lastRow.date,lastRow.io, lastRow.kind, lastRow.amount,lastRow.balance,lastRow.reason,detail.user,Some(0),lastId)
+          Detail(lastRow.date,lastRow.io, lastRow.kind, lastRow.amount,lastRow.balance,lastRow.reason,lastRow.user,Some(0),lastId)
         )
       }
       (newBalance,fId)
@@ -85,27 +85,18 @@ class AccountRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
     * @param endDate
     * @return
     */
-  def querySql(beginDate:String,endDate:String) ={
-    var query = accountTableQuery.filter(x =>(x.date >= beginDate && x.date <= endDate))
-//    if(user != "所有"){
-//      query = query.filter(_.user === user)
-//    }
-   /* if(io != "所有类型"){
-      query = query.filter(_.io === io)
-    }*/
-
-    db.run{
-      query.to[List].result
-    }
+  def querySql(beginDate:String,endDate:String) = db.run{
+    accountTableQuery.filter(x =>(x.date >= beginDate && x.date <= endDate)).to[List].result
   }
-
-
-
-
-
 
   def delete(id: Int): Future[Int] = db.run {
       accountTableQuery.filter(_.id === id).filter(_.whetherLatest === 1).delete
+  }
+
+  def updateLast = db.run {
+      val mId = accountTableQuery.map(_.id).max
+      val q = for {c <- accountTableQuery if c.id === mId} yield c.whetherLatest
+      q.update(1)
   }
 
   def getAll(): Future[List[Detail]] = db.run {

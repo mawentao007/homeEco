@@ -96,25 +96,7 @@ $(document).ready(function () {
 
                     showChart('#income_container',response.data.incomeJson,"收入");
                     showChart('#expense_container',response.data.expenseJson,"支出");
-                    showChart('#netIncome_container',response.data.netIncomeJson,"净收入");
                     showChart('#kind_container',response.data.kindJson,"分类支出");
-
-
-                    // //添加一行新的数据，用dataTable对象操作
-                    // var newDet = jQuery.parseJSON(formData);
-                    // newDet['id'] = response.data['id'];
-                    // newDet['balance'] = response.data['balance']
-                    // newDet['whetherLatest'] = 1
-                    // queryTable.fnAddData([newDet]);
-                    //
-                    //
-                    // //更新整个表
-                    // $('#accountDataTable').DataTable().ajax.reload();
-                    //
-                    //
-                    //
-                    // showSuccessAlert(response.msg);
-
                 } else {
                     $('#queryModal').modal('hide');
                     showErrorAlert(response.msg);
@@ -141,16 +123,16 @@ $(document).ready(function () {
             title: {
                 text: title
             },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
+            // tooltip: {
+            //     pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            // },
             plotOptions: {
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        format: '<b>{point.name}</b>: {y} ({point.percentage:.1f}%)',
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                         }

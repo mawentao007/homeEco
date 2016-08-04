@@ -55,14 +55,15 @@ class AccountController @Inject()(accRepository: AccountRepository, val messages
     *
     *
     */
-  //TODO   删除失败的情况要进行提示。
   def delete(accId: Int) = Action.async { request =>
     accRepository.delete(accId).map { x =>
-      if(x == 1) {
+      if(x != 0) {
+        accRepository.updateLast
         Ok(successResponse(Json.toJson("{}"), Messages("detail.success.deleted")))
-      }else{
-        Ok(successResponse(Json.toJson("{}"), Messages("detail.error.deleted")))
+      }else {
+        Ok(errorResponse(Json.toJson("{}"), Messages("detail.error.deleted")))
       }
+
     }
   }
 

@@ -36,39 +36,58 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
         accRepository.querySql(bdate,edate) map { details =>
           //income part
           val allIncome = details.filter(_.io == "收入")
-          val suIncome = allIncome.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
-          val maIncome = allIncome.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
+          //val suIncome = allIncome.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
+          //val maIncome = allIncome.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
           val incomeAmount = allIncome.map(_.amount).foldRight(0.0)(_ + _)
 
           //expense part
           val allExpense = details.filter(_.io == "支出")
-          val suExpense = allExpense.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
-          val maExpense = allExpense.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
+          //val suExpense = allExpense.filter( _.user == "粟样丹").map(_.amount).foldRight(0.0)(_ + _)
+          //val maExpense = allExpense.filter( _.user == "Marvin").map(_.amount).foldRight(0.0)(_ + _)
           val expenseAmount = allExpense.map(_.amount).foldRight(0.0)(_ + _)
 
-          val suNetIncome = suIncome - suExpense
-          val maNetIncome = maIncome - maExpense
+          //val suNetIncome = suIncome - suExpense
+          //val maNetIncome = maIncome - maExpense
           val netIncome = incomeAmount - expenseAmount
 
 
-          logger.info("su income " + suIncome + " ma income " + maIncome + " su Expense " + suExpense + " ma expense " + maExpense + " netincome " + netIncome + " ma net income " +
-            maNetIncome + " su net income " + suNetIncome)
+          //logger.info("su income " + suIncome + " ma income " + maIncome + " su Expense " + suExpense + " ma expense " + maExpense + " netincome " + netIncome + " ma net income " +
+          //  maNetIncome + " su net income " + suNetIncome)
 
+          val expenses:mutable.HashMap[String,Double] = mutable.HashMap()
+          allExpense.groupBy(_.user).foreach{
+            case(user,rows) =>
+              expenses.put(user,rows.map(_.amount).foldRight(0.0)(_ + _))
+          }
 
-          val incomeJson = Json.arr(
-            Json.obj("name"-> "粟样丹收入","y" -> suIncome),
-            Json.obj("name"-> "马文韬收入","y" -> maIncome)
+          val expenseJson = Json.toJson(
+            expenses.map{
+              case(k,v) => Json.obj("name" -> k,"y" -> v)
+            }
           )
 
-          val expenseJson = Json.arr(
-            Json.obj("name"-> "粟样丹支出","y" -> suExpense),
-            Json.obj("name"-> "马文韬支出","y" -> maExpense)
+          val income:mutable.HashMap[String,Double] = mutable.HashMap()
+          allIncome.groupBy(_.user).foreach{
+            case(user,rows) =>
+              income.put(user,rows.map(_.amount).foldRight(0.0)(_ + _))
+          }
+
+          val incomeJson = Json.toJson(
+            income.map{
+              case(k,v) => Json.obj("name" -> k,"y" -> v)
+            }
           )
 
-          val netIncomeJson = Json.arr(
-          Json.obj("name"-> "粟样丹净收入","y" -> suNetIncome),
-          Json.obj("name"-> "马文韬净收入","y" -> maNetIncome)
-          )
+//          val incomeJson = Json.arr(
+//            Json.obj("name"-> "粟样丹收入","y" -> suIncome),
+//            Json.obj("name"-> "马文韬收入","y" -> maIncome)
+//          )
+//
+//          val expenseJson = Json.arr(
+//            Json.obj("name"-> "粟样丹支出","y" -> suExpense),
+//            Json.obj("name"-> "马文韬支出","y" -> maExpense)
+//          )
+
 
           val kindExpenses:mutable.HashMap[String,Double] = mutable.HashMap()
           allExpense.groupBy(_.kind).foreach{
@@ -88,7 +107,6 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
               Seq(
                 "incomeJson"->incomeJson,
                 "expenseJson"-> expenseJson,
-                "netIncomeJson" -> netIncomeJson,
                 "detail" -> Json.toJson(details),
                 "kindJson" -> kindExpenseJson
               )

@@ -73,11 +73,11 @@ $(document).ready(function() {
                                   showSuccessAlert(response.msg);
                                   tableAccount.row(currentRow.parents('tr') ).remove().draw();
                               } else {
-                                  showErrorAlert(serverErrorMessage);
+                                  showErrorAlert(response.msg);
                               }
                         },
                      error: function(){
-                          showErrorAlert(serverErrorMessage);
+                          showErrorAlert(serverErrorMe);
                        }
                   });
             } else {
