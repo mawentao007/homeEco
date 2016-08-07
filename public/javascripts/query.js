@@ -40,9 +40,10 @@ $(document).ready(function () {
                     o[this.name] = parseInt(this.value);
                 } else if (this.name == 'amount') {
                     o[this.name] = parseFloat(this.value);
-                } else {
-                    o[this.name] = this.value || '';
                 }
+                // } else {
+                //     o[this.name] = this.value || '';
+                // }
             }
         });
         return JSON.stringify(o);
@@ -94,10 +95,15 @@ $(document).ready(function () {
                         ]
                     });
 
+
+                    showColumnChart('#range_container',response.data.xAxisJson,response.data.yDataJson,"消费记录");
+                    showColumnChart('#incomeByMonth_container',response.data.incomeByMonth.time,response.data.incomeByMonth.amount,"按月统计总收入");
+                    showColumnChart('#expenseByMonth_container',response.data.expenseByMonth.time,response.data.expenseByMonth.amount,"按月统计总支出");
+                    showColumnChart('#netIncomeByMonth_container',response.data.netIncomeByMonth.time,response.data.netIncomeByMonth.amount,"按月统计净收入");
                     showPieChart('#income_container',response.data.incomeJson,"收入");
                     showPieChart('#expense_container',response.data.expenseJson,"支出");
                     showPieChart('#kind_container',response.data.kindJson,"分类支出");
-                    showColumnChart('#range_container',response.data.xAxisJson,response.data.yDataJson,"趋势图")
+
                 } else {
                     $('#queryModal').modal('hide');
                     showErrorAlert(response.msg);
@@ -122,7 +128,8 @@ $(document).ready(function () {
                 type: 'pie'
             },
             title: {
-                text: title
+                text: title,
+                style:{ "color": "#333333", "fontSize": "20px","font-weight":"bold","margin-bottom":"10px"}
             },
             // tooltip: {
             //     pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -141,7 +148,7 @@ $(document).ready(function () {
                 }
             },
             series: [{
-                name: 'Brands',
+                name:"金额（元）",
                 colorByPoint: true,
                 data: chartData
             }]
@@ -157,23 +164,105 @@ $(document).ready(function () {
                 type: 'column'
             },
             title: {
-                text: title
+                text: title,
+                style:{ "color": "#333333", "fontSize": "20px","font-weight":"bold","margin-bottom":"10px" }
             },
 
             plotOptions: {
                 series: {
                     allowPointSelect: true
+                },
+
+                column: {
+                    dataLabels: {
+                        enabled: true,
+                        format: '{y}元',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
                 }
             },
 
             xAxis: {
-                categories: xJson
+                categories: xJson,
+                title:{
+                    text:'日期'
+                }
+            },
+
+            yAxis: {
+                allowDecimals: true,
+                min: 0,
+                title: {
+                    text: '金额（元)'
+                }
             },
 
             series: [{
-                name: '金额',
+                name: '消费记录',
                 colorByPoint: true,
                 data: yJson
+            }]
+        });
+    };
+
+    var showColumnChartByMonth = function (divId,response,title) {
+        $(divId).highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'column'
+            },
+            title: {
+                text: title,
+                style:{ "color": "#333333", "fontSize": "20px","font-weight":"bold","margin-bottom":"10px" }
+            },
+
+            plotOptions: {
+                series: {
+                    allowPointSelect: true
+                },
+
+                column: {
+                    dataLabels: {
+                        enabled: true,
+                        format: '{y}元',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+
+            xAxis: {
+                categories: response.data.expenseByMonth.time,
+                title:{
+                    text:'日期'
+                }
+            },
+
+            yAxis: {
+                allowDecimals: true,
+                min: 0,
+                title: {
+                    text: '金额（元)'
+                }
+            },
+
+            series: [{
+                name: '月支出',
+                color:'#f7a35c',
+                data: response.data.expenseByMonth.amount
+            },{
+                name: '月收入',
+                color:'#7cb5ec',
+                data: response.data.incomeByMonth.amount
+            },{
+                name: '月净收入',
+                color:'#90ed7d',
+                data: response.data.netIncomeByMonth.amount
             }]
         });
     };

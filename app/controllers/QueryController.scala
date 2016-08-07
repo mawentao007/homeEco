@@ -1,5 +1,8 @@
 package controllers
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
 import com.google.inject.Inject
 import models.Detail
 import play.api.Logger
@@ -31,9 +34,16 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
     * Handles request for getting all account from the database
     */
   def query() = Action.async(parse.json) { request =>
-    request.body.validate[(String,String)].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
+    request.body.validate[(Option[String],Option[String])].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
       case (bdate,edate) =>
-        accRepository.querySql(bdate,edate) map { details =>
+        //java.time.LocalDate.now
+//        val format = new SimpleDateFormat("yyyy-mm-dd")
+//        format.format(Calendar.getInstance().getTime())
+        val beginDate = bdate.getOrElse("2016-07-01")
+        val endDate = edate.getOrElse(java.time.LocalDate.now.toString)
+
+        logger.info("begindate " + endDate.toString)
+        accRepository.querySql(beginDate,endDate) map { details:List[Detail] =>
           //income part
           val allIncome = details.filter(_.io == "收入")
           val incomeAmount = allIncome.map(_.amount).foldRight(0.0)(_ + _)
@@ -45,6 +55,7 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
           val netIncome = incomeAmount - expenseAmount
 
 
+          //用户区间总支出
           val expenses:mutable.HashMap[String,Double] = mutable.HashMap()
           allExpense.groupBy(_.user).foreach{
             case(user,rows) =>
@@ -56,6 +67,7 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
             }
           )
 
+          //用户区间总收入
           val income:mutable.HashMap[String,Double] = mutable.HashMap()
           allIncome.groupBy(_.user).foreach{
             case(user,rows) =>
@@ -67,7 +79,7 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
             }
           )
 
-
+          //按种类区分支出
           val kindExpenses:mutable.HashMap[String,Double] = mutable.HashMap()
           allExpense.groupBy(_.kind).foreach{
             case(kind,rows) =>
@@ -80,11 +92,41 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
           )
 
 
-
+          //支出时间图
           val xAxisJson = Json.toJson(details.filter(_.io == "支出").map(_.date))
           val yDataJson = Json.toJson(
             details.filter(_.io == "支出").map(_.amount)
           )
+
+          //按月统计收入
+          val incomeByMonth = getDetailsByMonth(details).map{
+            case (month:String,dets) =>
+              (month,dets.filter(_.io == "收入").map(_.amount).foldRight(0.0)(_ + _))
+          }
+
+          val incomeByMonthJson = Json.obj(
+            "time" -> Json.toJson(incomeByMonth.map(_._1)),
+            "amount" -> Json.toJson(incomeByMonth.map(_._2))
+          )
+
+          //按月统计支出
+          val expenseByMonth = getDetailsByMonth(details).map {
+            case (month: String, dets: List[Detail]) =>
+              (month, dets.filter(_.io == "支出").map(_.amount).foldRight(0.0)(_ + _))
+          }
+          val expenseByMonthJson = Json.obj(
+            "time" -> Json.toJson(expenseByMonth.map(_._1)),
+            "amount" -> Json.toJson(expenseByMonth.map(_._2))
+          )
+
+          //按月统计净收入
+          val netIncomeByMonthJson = Json.obj(
+            "time" -> Json.toJson(expenseByMonth.map(_._1)),
+            "amount" -> Json.toJson(List(incomeByMonth.map(_._2),expenseByMonth.map(_._2)).transpose.map(_.sum))
+          )
+          logger.info(netIncomeByMonthJson.toString())
+
+
 
           Ok(successResponse(
             JsObject(
@@ -94,7 +136,10 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
                 "detail" -> Json.toJson(details),
                 "kindJson" -> kindExpenseJson,
                 "xAxisJson" -> xAxisJson,
-                "yDataJson" -> yDataJson
+                "yDataJson" -> yDataJson,
+                "incomeByMonth" -> incomeByMonthJson,
+                "expenseByMonth" -> expenseByMonthJson,
+                "netIncomeByMonth" -> netIncomeByMonthJson
               )
 
             ),
@@ -103,7 +148,14 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
     })
   }
 
-  //JsObject(Seq("key" -> JsObject))
+  def getDetailsByMonth(details:List[Detail]):List[(String,List[Detail])] = {
+    val groupByYear = details.groupBy(_.date.split('-').take(2).mkString("-")).map{
+      case (mon,det) =>
+        (mon,det)
+    }
+    groupByYear.toList
+  }
+
   /**
     * Handles request for creation of new account
     */
@@ -160,8 +212,8 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
   implicit val queryFormJson = (
     //readNullable 读取Option类型
     //    (JsPath \ "beginDate").readNullable[String] and
-        (JsPath \ "beginDate").read[String] and
-        (__ \ 'endDate).read[String]
+        (JsPath \ "beginDate").readNullable[String] and
+        (__ \ 'endDate).readNullable[String]
 //        (__ \'user).read[String] and
 //        (__ \'io).read[String]
     ) tupled
