@@ -122,7 +122,7 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
           //按月统计净收入
           val netIncomeByMonthJson = Json.obj(
             "time" -> Json.toJson(expenseByMonth.map(_._1)),
-            "amount" -> Json.toJson(List(incomeByMonth.map(_._2),expenseByMonth.map(_._2)).transpose.map(_.sum))
+            "amount" -> Json.toJson((incomeByMonth.map(_._2),expenseByMonth.map(_._2)).zipped.map(_ - _))
           )
           logger.info(netIncomeByMonthJson.toString())
 

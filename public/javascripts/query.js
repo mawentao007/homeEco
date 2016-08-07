@@ -7,7 +7,7 @@ $(document).ready(function () {
 
     $('#query_button').click(function () {
         $('#insert_button').addClass("modal disabled");
-    })
+    });
 
     $('#queryModal').on('shown.bs.modal', function () {
         $('#accountForm').trigger("reset");
@@ -16,17 +16,17 @@ $(document).ready(function () {
 // Show success alert message
     var showSuccessAlert = function (message) {
         $.toaster({priority: 'success', title: 'Success', message: message});
-    }
+    };
 
 // Show error alert message
 
 
     var showErrorAlert = function (message) {
         $.toaster({priority: 'danger', title: 'Error', message: message});
-    }
+    };
 
 // Convert form data in JSON format
-    $.fn.serializeObject = function () {
+    $.fn.serializeQueryObject = function () {
         var o = {};
         var a = this.serializeArray();
         $.each(a, function () {
@@ -52,7 +52,7 @@ $(document).ready(function () {
 
 // 提交新条目的处理请求
     $('#queryForm').on('submit', function (e) {
-        var formData = $("#queryForm").serializeObject();
+        var formData = $("#queryForm").serializeQueryObject();
         //dataTable返回jq对象，DataTable是新对象，包含一系列api。可以不用这个，而用dataTable.api()访问。
         e.preventDefault();
         $.ajax({
@@ -96,10 +96,10 @@ $(document).ready(function () {
                     });
 
 
-                    showColumnChart('#range_container',response.data.xAxisJson,response.data.yDataJson,"消费记录");
-                    showColumnChart('#incomeByMonth_container',response.data.incomeByMonth.time,response.data.incomeByMonth.amount,"按月统计总收入");
-                    showColumnChart('#expenseByMonth_container',response.data.expenseByMonth.time,response.data.expenseByMonth.amount,"按月统计总支出");
-                    showColumnChart('#netIncomeByMonth_container',response.data.netIncomeByMonth.time,response.data.netIncomeByMonth.amount,"按月统计净收入");
+                    showColumnChart('#range_container',response.data.xAxisJson,response.data.yDataJson,"消费记录","#f379f1");
+                    showColumnChart('#incomeByMonth_container',response.data.incomeByMonth.time,response.data.incomeByMonth.amount,"按月统计总收入",'#7cb5ec');
+                    showColumnChart('#expenseByMonth_container',response.data.expenseByMonth.time,response.data.expenseByMonth.amount,"按月统计总支出","#62f96b");
+                    showColumnChart('#netIncomeByMonth_container',response.data.netIncomeByMonth.time,response.data.netIncomeByMonth.amount,"按月统计净收入","#8085e9");
                     showPieChart('#income_container',response.data.incomeJson,"收入");
                     showPieChart('#expense_container',response.data.expenseJson,"支出");
                     showPieChart('#kind_container',response.data.kindJson,"分类支出");
@@ -155,7 +155,7 @@ $(document).ready(function () {
         });
     };
 
-    var showColumnChart = function (divId,xJson,yJson,title) {
+    var showColumnChart = function (divId,xJson,yJson,title,color) {
         $(divId).highcharts({
             chart: {
                 plotBackgroundColor: null,
@@ -177,9 +177,9 @@ $(document).ready(function () {
                     dataLabels: {
                         enabled: true,
                         format: '{y}元',
-                        style: {
-                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                        }
+                        // style: {
+                        //     color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        // }
                     }
                 }
             },
@@ -200,9 +200,9 @@ $(document).ready(function () {
             },
 
             series: [{
-                name: '消费记录',
-                colorByPoint: true,
-                data: yJson
+                name: '金额',
+                data: yJson,
+                color:color
             }]
         });
     };

@@ -163,8 +163,8 @@ $.fn.serializeObject = function() {
                          //添加一行新的数据，用dataTable对象操作
                          var newDet = jQuery.parseJSON(formData);
                          newDet['id'] = response.data['id'];
-                         newDet['balance'] = response.data['balance']
-                         newDet['whetherLatest'] = 1
+                         newDet['balance'] = response.data['balance'];
+                         newDet['whetherLatest'] = 1;
                          detailTable.fnAddData([newDet]);
 
                          //通过cell访问单个节点值
