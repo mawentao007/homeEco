@@ -15,7 +15,7 @@ $(document).ready(function() {
               {"className": "dt-center", "targets": "_all"}  //获取所有目标
            ],
 
-        "order": [[ 8, 'asc' ]],
+        "order": [[ 8, 'des' ]],
 
         "ajax": {
             "url": "/detail/list",
