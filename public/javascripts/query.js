@@ -30,10 +30,9 @@ $(document).ready(function () {
         var o = {};
         var a = this.serializeArray();
         $.each(a, function () {
-
-                o[this.name] = this.value || '';
-
-
+            if(this.value != None) {
+                o[this.name] = this.value;
+            }
         });
         return JSON.stringify(o);
     };

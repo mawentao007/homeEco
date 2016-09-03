@@ -42,7 +42,7 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
         val beginDate = bdate.getOrElse("2016-07-01")
         val endDate = edate.getOrElse(java.time.LocalDate.now.toString)
 
-        logger.info("begindate " + endDate.toString)
+        logger.info(beginDate.toString + " " + endDate.toString)
         accRepository.querySql(beginDate,endDate) map { details:List[Detail] =>
           //income part
           val allIncome = details.filter(_.io == "收入")
