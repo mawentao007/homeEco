@@ -36,12 +36,11 @@ class QueryController @Inject()(accRepository: AccountRepository, val messagesAp
   def query() = Action.async(parse.json) { request =>
     request.body.validate[(Option[String],Option[String])].fold(error => Future.successful(BadRequest(JsError.toJson(error))),{
       case (bdate,edate) =>
-        //java.time.LocalDate.now
-//        val format = new SimpleDateFormat("yyyy-mm-dd")
-//        format.format(Calendar.getInstance().getTime())
+
         val beginDate = bdate.getOrElse("2016-07-01")
         val endDate = edate.getOrElse(java.time.LocalDate.now.toString)
 
+        //logger.info("test")
         logger.info(beginDate.toString + " " + endDate.toString)
         accRepository.querySql(beginDate,endDate) map { details:List[Detail] =>
           //income part
